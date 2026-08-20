@@ -1,0 +1,249 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MovieMatch — Group Movie Decision Platform</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <main id="app-container">
+    
+    <!-- 1. HOME SCREEN -->
+    <section id="screen-home" class="screen active">
+      <header class="brand-header">
+        <span class="brand-icon" aria-hidden="true">🍿</span>
+        <h1 class="brand-title">MovieMatch</h1>
+      </header>
+      <p class="text-subtitle" style="text-align: center; margin-bottom: var(--space-24);">
+        Swipe with friends, eliminate decision fatigue, and find the perfect movie to watch together.
+      </p>
+
+      <div class="card card--hero">
+        <div class="form-group">
+          <label class="form-label" for="user-name-input">Your Nickname</label>
+          <div class="form-input-row">
+            <input type="text" id="user-name-input" class="form-input" placeholder="e.g. Cinephile" maxlength="18" autocomplete="nickname" />
+            <button id="btn-random-name" class="btn btn--icon" title="Generate Random Name" type="button" aria-label="Generate Random Name">🎲</button>
+          </div>
+        </div>
+
+        <button id="btn-create-room" class="btn btn--primary" type="button">
+          Create Group Room
+        </button>
+      </div>
+
+      <div class="divider">or join with code</div>
+
+      <div class="card">
+        <div class="form-group">
+          <label class="form-label" for="join-code-input">4-Digit Room Code</label>
+          <input type="text" id="join-code-input" class="form-input form-input--code" placeholder="0000" maxlength="4" inputmode="numeric" />
+        </div>
+        <button id="btn-join-room" class="btn btn--secondary" type="button">
+          Join Existing Room
+        </button>
+      </div>
+    </section>
+
+    <!-- 2. LOBBY SCREEN -->
+    <section id="screen-lobby" class="screen">
+      <header class="brand-header" style="margin-top: 0;">
+        <span class="brand-icon" aria-hidden="true">🎬</span>
+        <h1 class="title-section">Movie Lobby</h1>
+      </header>
+
+      <div class="room-code-card">
+        <span class="room-code-label">Room Code</span>
+        <div id="lobby-room-code" class="room-code-display">----</div>
+        <div class="room-actions-row">
+          <button id="btn-copy-code" class="btn btn--ghost room-action-btn" type="button">📋 Copy Link</button>
+          <button id="btn-share-room" class="btn btn--ghost room-action-btn" type="button">📤 Share</button>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <span class="section-label">Connected Friends</span>
+        <span id="lobby-player-count" class="text-caption"></span>
+      </div>
+      <div id="lobby-players-list" class="player-list">
+        <!-- Dynamically rendered -->
+      </div>
+
+      <div class="section-header">
+        <span class="section-label">Selected Filters</span>
+      </div>
+      <div id="lobby-filter-summary" class="summary-container">
+        <!-- Dynamically rendered -->
+      </div>
+
+      <div style="margin-top: auto; padding-top: var(--space-12);">
+        <button id="btn-start-game" class="btn btn--primary" type="button" style="display: none;">
+          Start Swiping
+        </button>
+        <div id="lobby-waiting-msg" class="text-subtitle" style="display: none; text-align: center; padding: var(--space-12);">
+          Waiting for the host to start...
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. VOTING ARENA SCREEN -->
+    <section id="screen-voting" class="screen">
+      <div class="arena-header">
+        <div id="deck-progress-badge" class="arena-badge">Card 1 / 15</div>
+        <div id="friends-status-badge" class="text-caption" style="font-weight: 600; color: var(--color-info);">Friends voting...</div>
+      </div>
+
+      <div id="card-stack-container" class="card-stack">
+        <!-- Tinder Swipe Cards rendered dynamically -->
+      </div>
+
+      <div id="action-buttons-bar" class="action-bar">
+        <button id="btn-vote-nope" class="action-circle-btn action-circle-btn--nope" type="button" title="Pass (Swipe Left)" aria-label="Pass">✕</button>
+        <button id="btn-card-info" class="action-circle-btn action-circle-btn--info" type="button" title="View Movie Details" aria-label="View Movie Details">ℹ</button>
+        <button id="btn-vote-like" class="action-circle-btn action-circle-btn--like" type="button" title="Like (Swipe Right)" aria-label="Like">♥</button>
+      </div>
+
+      <!-- WAITING CONTAINER WHEN USER FINISHES DECK -->
+      <div id="waiting-box" class="waiting-container">
+        <div class="waiting-spinner" aria-hidden="true">🍿</div>
+        <h2 class="title-section" style="margin-bottom: var(--space-8);">All Swiped!</h2>
+        <p class="text-subtitle" style="max-width: 280px; margin-bottom: var(--space-24);">
+          Waiting for your friends to finish swiping through their cards...
+        </p>
+        <button id="btn-force-results" class="btn btn--secondary" type="button" style="display: none; max-width: 260px;">
+          End Voting & Show Winner
+        </button>
+      </div>
+    </section>
+
+    <!-- 4. RESULTS SCREEN -->
+    <section id="screen-results" class="screen">
+      <div class="results-header">
+        <div id="winner-tie-badge" class="badge badge--rating" style="display: none; margin-bottom: var(--space-8);">
+          🎲 Resolved by Random Tie-Breaker
+        </div>
+        <h2 class="title-display">Group Winner!</h2>
+      </div>
+
+      <div class="winner-card-container">
+        <img id="winner-poster-img" class="winner-poster" src="" alt="Winner Poster" />
+        <div class="winner-body">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4);">
+            <span id="winner-movie-rating" class="badge badge--rating">⭐ 8.5</span>
+            <span id="winner-movie-year" class="text-caption">2024</span>
+          </div>
+          <h3 id="winner-movie-title" class="title-section" style="margin: var(--space-4) 0;">Movie Title</h3>
+          <div id="winner-genres" class="text-caption" style="margin-bottom: var(--space-12);"></div>
+          
+          <div id="winner-votes-stat" class="stat-banner">
+            Liked by 3 of 3 friends (100%)
+          </div>
+
+          <p id="winner-movie-overview" class="text-subtitle" style="font-size: var(--font-size-caption); max-height: 80px; overflow-y: auto;">
+            Overview synopsis...
+          </p>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <span class="section-label">Full Ranking Breakdown</span>
+      </div>
+      <div id="results-leaderboard-list" class="leaderboard-list">
+        <!-- Full Leaderboard populated dynamically -->
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: var(--space-8); margin-top: auto; padding-top: var(--space-12);">
+        <button id="btn-restart-game" class="btn btn--primary" type="button" style="display: none;">
+          Start New Round
+        </button>
+        <button id="btn-leave-room" class="btn btn--ghost" type="button">
+          Leave Room
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: HOST ROOM SETUP -->
+  <div id="modal-filters" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 class="title-section">Room Preferences</h2>
+        <button class="modal-close-btn close-modal" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="filter-region-select">Region & Providers</label>
+        <select id="filter-region-select" class="form-input" style="margin-bottom: var(--space-8);">
+          <option value="IN">🇮🇳 India (Netflix, Prime, JioHotstar, Apple TV+)</option>
+          <option value="US">🇺🇸 United States (Netflix, Max, Hulu, Disney+)</option>
+          <option value="GB">🇬🇧 United Kingdom (BBC iPlayer, NOW, Netflix)</option>
+        </select>
+        <div id="filter-providers-list" class="chip-grid">
+          <!-- Dynamically populated chips -->
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Movie Genres</label>
+        <div id="filter-genres-list" class="chip-grid" style="max-height: 140px; overflow-y: auto;">
+          <!-- Dynamically populated chips -->
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <label class="form-label" style="margin: 0;">Minimum Rating</label>
+          <span id="filter-rating-val" class="badge badge--rating">⭐ 6.0+</span>
+        </div>
+        <input type="range" id="filter-rating-slider" class="range-input" min="5.0" max="8.5" step="0.5" value="6.0" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Cards in Deck</label>
+        <div class="chip-grid" style="display: grid; grid-template-columns: repeat(3, 1fr);">
+          <button type="button" class="chip card-count-btn" data-count="10">10</button>
+          <button type="button" class="chip card-count-btn active" data-count="15">15</button>
+          <button type="button" class="chip card-count-btn" data-count="20">20</button>
+        </div>
+      </div>
+
+      <button id="btn-confirm-filters" class="btn btn--primary" type="button" style="margin-top: var(--space-12);">
+        Enter Lobby
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: MOVIE DETAIL SYNOPSIS -->
+  <div id="modal-detail" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 id="detail-title" class="title-section">Movie Details</h2>
+        <button class="modal-close-btn close-modal" aria-label="Close modal">&times;</button>
+      </div>
+      <div style="display: flex; gap: var(--space-8); align-items: center; margin-bottom: var(--space-12);">
+        <span id="detail-rating" class="badge badge--rating">⭐ 8.0</span>
+        <span id="detail-year" class="text-caption">2023</span>
+      </div>
+      <div class="text-caption" style="margin-bottom: var(--space-8); color: var(--color-info);">
+        Streaming on: <span id="detail-providers" style="color: var(--text-primary); font-weight: 600;"></span>
+      </div>
+      <div class="text-caption" style="margin-bottom: var(--space-16);">
+        Genres: <span id="detail-genres" style="color: var(--text-primary); font-weight: 600;"></span>
+      </div>
+      <div class="form-label">Plot Synopsis</div>
+      <p id="detail-overview" class="text-subtitle" style="line-height: 1.6;"></p>
+    </div>
+  </div>
+
+  <!-- JS Dependencies -->
+  <script src="/static/js/swipe.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
