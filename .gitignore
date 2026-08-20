@@ -1,0 +1,15 @@
+﻿__pycache__/
+*.py[cod]
+*$py.class
+.env
+venv/
+env/
+.idea/
+.vscode/
+*.log
+test_*.py
+diag*.py
+update_*.py
+write_*.py
+builder_*.py
+make_*.py
